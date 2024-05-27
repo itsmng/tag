@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------
-Tag plugin for GLPI
+Tag plugin for ITSM-NG
 -------------------------------------------------------------------------
 
 LICENSE
@@ -21,5 +21,5 @@ along with Tag. If not, see <http://www.gnu.org/licenses/>.
 -------------------------------------------------------------------------
 @copyright Copyright (C) 2014-2022 by Teclib'.
 @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
-@link      https://github.com/pluginsGLPI/tag
+@link      https://github.com/itsmng/tag
 -------------------------------------------------------------------------
