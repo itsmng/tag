@@ -136,7 +136,7 @@ class PluginTagTagItem extends CommonDBRelation {
                                                 'checkright' => true]);
          echo "</td><td class='center'>";
          echo "<input type='hidden' name='plugin_tag_tags_id' value='$instID'>";
-         echo "<input type='submit' name='add' value=\""._sx('button', 'Add')."\" class='submit'>";
+         echo "<input type='submit' name='add' value=\""._sx('button', 'Add')."\" class='btn btn-sm btn-secondary'>";
          echo "</td></tr>";
          echo "</table>";
          Html::closeForm();
@@ -147,9 +147,12 @@ class PluginTagTagItem extends CommonDBRelation {
       if ($canedit && $number) {
          Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
 
-         $massiveactionparams['specific_actions']
-               = [ 'MassiveAction:purge'
-                =>  _x('button', 'Delete permanently the relation with selected elements')];
+         $massiveactionparams = [
+            'specific_actions' => [
+                'MassiveAction:purge' =>  _x('button', 'Delete permanently the relation with selected elements'),
+            ],
+            'deprecated' => true,
+         ];
 
          Html::showMassiveActions($massiveactionparams);
       }

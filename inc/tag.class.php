@@ -81,42 +81,6 @@ class PluginTagTag extends CommonDropdown {
          return false;
       }
 
-      $this->initForm($ID, $options);
-      $this->showFormHeader($options);
-
-      echo '<table class="tab_cadre_fixe">';
-      echo "<tr class='line0 tab_bg_2'>";
-      echo "<td><label for='name'>".__('Name')." <span class='red'>*</span></label></td>";
-      echo "<td>";
-      echo '<input type="text" id="name" name="name" value="'.$this->fields['name'].'" size="40" required>';
-      echo "</td>";
-      echo "</tr>";
-
-      echo "<tr class='line1 tab_bg_2'>";
-      echo "<td><label for='comment'>".__('Description')."</label></td>";
-      echo "<td>";
-      echo "<textarea name='comment' id ='comment' cols='45' rows='3'>".
-            $this->fields['comment'].
-            "</textarea>";
-      echo "</td>";
-      echo "</tr>";
-
-      echo "<tr class='line1 tab_bg_2'>";
-      echo "<td><label>".__('HTML color', 'tag')."</label></td>";
-      echo "<td>";
-      Html::showColorField('color', ['value' => $this->fields['color']]);
-      echo "</td>";
-      echo "</tr>";
-
-      echo "<tr class='line0 tab_bg_2'>";
-      echo "<td><label>"
-           ._n('Associated item type', 'Associated item types', 2)."</label></td>";
-      echo "</td>";
-      echo "<td>";
-      // show an hidden input to permist deletion of all values
-      echo Html::hidden("type_menu");
-
-      // retrieve tags elements and existing values
       $type_menu_elements = [];
       foreach ($CFG_GLPI['plugin_tag_itemtypes'] as $group_label => $group_values) {
          foreach ($group_values as $itemtype) {
@@ -128,16 +92,48 @@ class PluginTagTag extends CommonDropdown {
          $type_menu_values = [];
       }
 
-      // show the multiple dropdown
-      Dropdown::showFromArray("type_menu",
-                              $type_menu_elements,
-                              ['values'   => $type_menu_values,
-                               'multiple' => 'multiples']);
 
-      echo "</td>";
-      echo "</tr>";
-
-      $this->showFormButtons($options);
+      $form = [
+        'action'     => $this->getFormURL(),
+        'itemtype'   => $this->getType(),
+        'content' => [
+            $this->getTypeName() => [
+                'visible' => true,
+                'inputs'  => [
+                    __('Name') => [
+                        'required' => true,
+                        'name'     => 'name',
+                        'type'     => 'text',
+                        'value'    => $this->fields['name'],
+                        'size'     => 40,
+                        'col_lg'  => 12,
+                        'col_md'  => 12,
+                    ],
+                    __('Description') => [
+                        'name'     => 'comment',
+                        'type'     => 'textarea',
+                        'value'    => $this->fields['comment'],
+                        'rows'     => 3,
+                        'col_lg'  => 12,
+                        'col_md'  => 12,
+                    ],
+                    __('HTML color', 'tag') => [
+                        'name'     => 'color',
+                        'type'     => 'color',
+                        'value'    => $this->fields['color'],
+                    ],
+                    _n('Associated item type', 'Associated item types', 2) => [
+                        'name'     => 'type_menu[]',
+                        'type'     => 'select',
+                        'multiple' => true,
+                        'values'  => $type_menu_elements,
+                        'value'    => $type_menu_values,
+                    ],
+                ]
+            ]
+        ],
+      ];
+      renderTwigForm($form, '', $this->fields);
 
       return true;
    }
