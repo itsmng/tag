@@ -16,17 +16,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PHP with composer
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          tools: composer:v2
-
       - name: Build project
         run: |
           cd /home/runner/work/tag/
-          cd tag && composer install --no-dev && cd ..
-          rm -r tag/.git* tag/composer.* tag/tools
+          rm -r tag/.git*
           tar -zcvf tag-${{ github.ref_name }}.tgz tag
 
       - name: Upload release
