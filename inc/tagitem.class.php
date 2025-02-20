@@ -379,6 +379,8 @@ class PluginTagTagItem extends CommonDBRelation {
             $tag_value = str_replace("newtag_", "", $tag_value);
             $tag_value = $tag->add([
                'name' => $tag_value,
+               'entities_id' => Session::getActiveEntity(),
+               'is_recursive' => Session::getIsActiveEntityRecursive(),
             ]);
          }
       }
