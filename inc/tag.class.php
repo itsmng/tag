@@ -461,16 +461,20 @@ class PluginTagTag extends CommonDropdown {
 
             $html_tag = ($itemtype == 'Ticket') ? "th" : 'td';
 
-            echo "<tr class='tab_bg_1'>";
-            echo "<$html_tag>"._n('Tag', 'Tags', 2, 'tag')."</$html_tag>";
-            echo "<td colspan='3'>";
+            echo "<div class='container mb-3'>";
+            echo "<div class='col-12 col-md-6 col-lg-4 text-start'>";
+            echo "<label class='form-label w-100'>";
+            echo _n('Tag', 'Tags', 2, 'tag');
+            echo "<div class='d-flex flex-nowrap w-100 justify-content-between align-items-center input-group my-1'>";
             self::showTagDropdown([
                'itemtype' => $itemtype,
                'id'       => $item->getId(),
                'value'    => $value,
             ]);
-            echo "</td>";
-            echo "</tr>";
+            echo "</div>";
+            echo "</label>";
+            echo "</div>";
+            echo "</div>";
          }
       }
    }
