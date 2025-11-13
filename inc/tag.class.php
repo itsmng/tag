@@ -92,6 +92,7 @@ class PluginTagTag extends CommonDropdown {
          $type_menu_values = [];
       }
 
+      $type_menu_html = $this->getTypeMenuCustomDisplay($type_menu_elements, $type_menu_values);
 
       $form = [
         'action'     => $this->getFormURL(),
@@ -123,11 +124,9 @@ class PluginTagTag extends CommonDropdown {
                         'value'    => $this->fields['color'],
                     ],
                     _n('Associated item type', 'Associated item types', 2) => [
-                        'name'     => 'type_menu[]',
-                        'type'     => 'select',
-                        'multiple' => true,
-                        'values'  => $type_menu_elements,
-                        'value'    => $type_menu_values,
+                        'content' => $type_menu_html,
+                        'col_lg'  => 6,
+                        'col_md'  => 6,
                     ],
                 ]
             ]
@@ -136,6 +135,87 @@ class PluginTagTag extends CommonDropdown {
       renderTwigForm($form, '', $this->fields);
 
       return true;
+   }
+
+   private function getTypeMenuCustomDisplay($type_menu_elements, $type_menu_values) {
+      $rand = mt_rand();
+      $html = '';
+      
+      if (!empty($type_menu_values)) {
+         $html .= "<div id='selected_$rand' style='border:1px solid #ddd;padding:10px;margin-bottom:10px;background:#f8f9fa'>";
+         $html .= "<strong>" . __('Currently selected types:', 'tag') . "</strong><br><br>";
+         
+         foreach ($type_menu_values as $itemtype) {
+            if (class_exists($itemtype)) {
+               $item = new $itemtype();
+               $html .= "<span class='badge bg-secondary me-2 mb-2' data-type='$itemtype'>";
+               $html .= $item::getTypeName();
+               $html .= " <i class='fas fa-times' style='cursor:pointer' onclick='removeType(\"$itemtype\",$rand)'></i>";
+               $html .= "</span>";
+            }
+         }
+         $html .= "</div>";
+      }
+      
+      $html .= "<select id='select_$rand' class='form-select' style='margin-bottom:10px'>";
+      $html .= "<option value=''>-- " . __('Select a type') . " --</option>";
+      
+      foreach ($type_menu_elements as $group => $types) {
+         $html .= "<optgroup label='$group'>";
+         foreach ($types as $itemtype => $name) {
+            if (!in_array($itemtype, $type_menu_values)) {
+               $html .= "<option value='$itemtype'>$name</option>";
+            }
+         }
+         $html .= "</optgroup>";
+      }
+      $html .= "</select>";
+      $html .= "<button type='button' class='btn btn-primary' onclick='addType($rand)'><i class='fas fa-plus'></i> " . __('Add') . "</button>";
+      
+      foreach ($type_menu_values as $value) {
+         $html .= "<input type='hidden' name='type_menu[]' value='$value' data-type='$value'>";
+      }
+      
+      $html .= "<script>
+      var types_$rand = " . json_encode($this->getAllTypeNames($type_menu_elements)) . ";
+      
+      function addType(r) {
+         var sel = $('#select_'+r);
+         var type = sel.val();
+         if (!type) return alert('" . __('Please select a type') . "');
+         
+         var name = sel.find('option:selected').text();
+         var cont = $('#selected_'+r);
+         
+         if (cont.length === 0) {
+            cont = $('<div id=\"selected_'+r+'\" style=\"border:1px solid #ddd;padding:10px;margin-bottom:10px;background:#f8f9fa\"><strong>" . __('Currently selected types:', 'tag') . "</strong><br><br></div>');
+            sel.before(cont);
+         }
+         
+         cont.append('<span class=\"badge bg-secondary me-2 mb-2\" data-type=\"'+type+'\">'+name+' <i class=\"fas fa-times\" style=\"cursor:pointer\" onclick=\"removeType(\\''+type+'\\','+r+')\"></i></span>');
+         sel.after('<input type=\"hidden\" name=\"type_menu[]\" value=\"'+type+'\" data-type=\"'+type+'\">');
+         sel.find('option:selected').remove();
+         sel.val('');
+      }
+      
+      function removeType(type, r) {
+         $('[data-type=\"'+type+'\"]').remove();
+         var name = types_$r[type];
+         if (name) $('#select_'+r).append('<option value=\"'+type+'\">'+name+'</option>');
+      }
+      </script>";
+      
+      return $html;
+   }
+   
+   private function getAllTypeNames($type_menu_elements) {
+      $names = [];
+      foreach ($type_menu_elements as $types) {
+         foreach ($types as $itemtype => $name) {
+            $names[$itemtype] = $name;
+         }
+      }
+      return $names;
    }
 
    public static function install(Migration $migration) {

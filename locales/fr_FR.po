@@ -54,3 +54,9 @@ msgstr "Gestion des tags"
 #: inc/config.class.php:27
 msgid "Tags location"
 msgstr ""
+
+msgid "Currently selected types:"
+msgstr "Types actuellement sélectionnés :"
+
+msgid "Please select a type"
+msgstr "Veuillez sélectionner un type"
