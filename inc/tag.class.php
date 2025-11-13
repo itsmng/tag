@@ -62,6 +62,14 @@ class PluginTagTag extends CommonDropdown {
       ];
    }
 
+   private static function isList(array $items) {
+      if ($items === []) {
+         return true;
+      }
+
+      return array_keys($items) === range(0, count($items) - 1);
+   }
+
    /**
     * Check if the passed itemtype is in the blacklist
     *
@@ -87,9 +95,38 @@ class PluginTagTag extends CommonDropdown {
             $type_menu_elements[$group_label][$itemtype] = $itemtype::getTypeName();
          }
       }
-      $type_menu_values = json_decode($this->fields['type_menu']);
-      if (!is_array($type_menu_values)) {
-         $type_menu_values = [];
+      $type_menu_values = [];
+      if (isset($this->fields['type_menu'])) {
+         $decoded = json_decode($this->fields['type_menu'], true);
+
+         if (is_array($decoded)) {
+            if (self::isList($decoded)) {
+               $type_menu_values = array_values(array_filter($decoded, static function ($value) {
+                  return is_string($value) && $value !== '';
+               }));
+            } else {
+               $type_menu_values = array_keys(array_filter($decoded, static function ($value, $key) {
+                  return is_string($key) && $key !== '';
+               }, ARRAY_FILTER_USE_BOTH));
+            }
+         } else if (is_string($this->fields['type_menu'])) {
+            $legacy_values = array_values(array_filter(array_map('trim', explode(',', $this->fields['type_menu'])), static function ($value) {
+               return $value !== '';
+            }));
+            if (!empty($legacy_values)) {
+               $type_menu_values = $legacy_values;
+            }
+         }
+      }
+
+      $type_menu_map = [];
+      foreach ($type_menu_values as $itemtype) {
+         $type_menu_map[$itemtype] = true;
+      }
+
+      $type_menu_json = json_encode($type_menu_map);
+      if ($type_menu_json === false) {
+         $type_menu_json = '{}';
       }
 
 
@@ -127,7 +164,7 @@ class PluginTagTag extends CommonDropdown {
                         'type'     => 'select',
                         'multiple' => true,
                         'values'  => $type_menu_elements,
-                        'value'    => $type_menu_values,
+                        'value'    => $type_menu_json,
                     ],
                 ]
             ]
