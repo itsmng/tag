@@ -668,24 +668,46 @@ class PluginTagTag extends CommonDropdown {
 
       // call select2 lib for this input
       echo Html::scriptBlock("
-         $.getScript(CFG_GLPI.root_doc + '/node_modules/select2/dist/js/select2.min.js', function() {
-            $('#tag_select_$rand').select2({
-               width: 'calc(100% - 20px)',
-               templateResult: formatOptionResult,
-               templateSelection: formatOptionSelection,
-               formatSearching: '".__("Loading...")."',
-               data: ".json_encode($select2_tags).",
-               tags: true,
-               tokenSeparators: [',', ';'],
-               disabled: ".($readOnly ? 'true': 'false').",
-               createTag: function (params) {
-                  var term = $.trim(params.term);
-                  if (term === '') {
-                     return null;
+         $(document).ready(function() {
+            if (typeof $.fn.select2 === 'undefined') {
+               $.getScript(CFG_GLPI.root_doc + '/node_modules/select2/dist/js/select2.min.js', function() {
+                  $('#tag_select_$rand').select2({
+                     width: 'calc(100% - 20px)',
+                     templateResult: formatOptionResult,
+                     templateSelection: formatOptionSelection,
+                     formatSearching: '".__("Loading...")."',
+                     data: ".json_encode($select2_tags).",
+                     tags: true,
+                     tokenSeparators: [',', ';'],
+                     disabled: ".($readOnly ? 'true': 'false').",
+                     createTag: function (params) {
+                        var term = $.trim(params.term);
+                        if (term === '') {
+                           return null;
+                        }
+                        $token_creation
+                     }
+                  });
+               });
+            } else {
+               $('#tag_select_$rand').select2({
+                  width: 'calc(100% - 20px)',
+                  templateResult: formatOptionResult,
+                  templateSelection: formatOptionSelection,
+                  formatSearching: '".__("Loading...")."',
+                  data: ".json_encode($select2_tags).",
+                  tags: true,
+                  tokenSeparators: [',', ';'],
+                  disabled: ".($readOnly ? 'true': 'false').",
+                  createTag: function (params) {
+                     var term = $.trim(params.term);
+                     if (term === '') {
+                        return null;
+                     }
+                     $token_creation
                   }
-                  $token_creation
-               }
-            });
+               });
+            }
          });
       ");
 
