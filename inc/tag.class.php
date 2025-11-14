@@ -464,25 +464,18 @@ class PluginTagTag extends CommonDropdown {
          return false;
       }
 
-      if (isset($params['item'])
-         && $params['item'] instanceof CommonDBTM) {
-         $item     = $params['item'];
+      if (isset($params['item']) && $params['item'] instanceof CommonDBTM) {
+         $item = $params['item'];
          $itemtype = get_class($item);
 
-         // KnowbaseItem is special form, i think we want to skip tab detection
          if (!$item instanceof KnowbaseItem) {
-            // we want tag input only for primary form (not ticket solution for example)
-            $callers   = debug_backtrace();
-            /*Toolbox::logDebug($params['options']);
-            Toolbox::backtrace();*/
+            $callers = debug_backtrace();
             foreach ($callers as $call) {
                if ($call['function'] == 'displayTabContentForItem'
-                  // ticket solution is a pain to detect, direct exclusion
                   || $call['function'] == 'showSolutionForm') {
                   return false;
                }
             }
-            // no sub objects form (like followups and task)
             if (isset($params['options']['parent'])
                && $params['options']['parent'] instanceof CommonDBTM) {
                return false;
@@ -490,28 +483,46 @@ class PluginTagTag extends CommonDropdown {
          }
 
          if (self::canItemtype($itemtype)) {
-            // manage values after a redirect (ex ticket creation, after a cat change)
             $value = '';
             if (isset($item->input['_plugin_tag_tag_values'])) {
                $value = $item->input['_plugin_tag_tag_values'];
             }
 
-            $html_tag = ($itemtype == 'Ticket') ? "th" : 'td';
-
-            echo "<div class='container mb-3'>";
-            echo "<div class='col-12 col-md-6 col-lg-4 text-start'>";
-            echo "<label class='form-label w-100'>";
-            echo _n('Tag', 'Tags', 2, 'tag');
-            echo "<div class='d-flex flex-nowrap w-100 justify-content-between align-items-center input-group my-1'>";
-            self::showTagDropdown([
-               'itemtype' => $itemtype,
-               'id'       => $item->getId(),
-               'value'    => $value,
-            ]);
-            echo "</div>";
-            echo "</label>";
-            echo "</div>";
-            echo "</div>";
+            $rand = mt_rand();
+            ?>
+            <div id="tag_inject_<?php echo $rand; ?>">
+               <?php echo Html::hidden('_plugin_tag_tag_process_form', ['value' => '1']); ?>
+               <div class="mb-3">
+                  <label class="form-label"><?php echo _n('Tag', 'Tags', 2, 'tag'); ?></label>
+                  <?php
+                  self::showTagDropdown([
+                     'itemtype' => $itemtype,
+                     'id'       => $item->getId(),
+                     'value'    => $value,
+                  ]);
+                  ?>
+               </div>
+            </div>
+            <script>
+            $(document).ready(function() {
+               var checkForm = setInterval(function() {
+                  var form = $('form[name="form"]');
+                  if (form.length === 0) {
+                     form = $('form[aria-label="Main Form"]');
+                  }
+                  if (form.length > 0) {
+                     clearInterval(checkForm);
+                     var tagDiv = $('#tag_inject_<?php echo $rand; ?>');
+                     form.children('div').first().after(tagDiv);
+                  }
+               }, 100);
+               
+               setTimeout(function() {
+                  clearInterval(checkForm);
+               }, 3000);
+            });
+            </script>
+            <?php
          }
       }
    }
