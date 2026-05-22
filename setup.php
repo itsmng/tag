@@ -132,7 +132,7 @@ function plugin_version_tag() {
       'name'       => __('Tag Management', 'tag'),
       'version'        => PLUGIN_TAG_VERSION,
       'author'         => '<a href="http://www.teclib.com">Teclib\'</a> - Infotel conseil',
-      'homepage'       => 'https://github.com/pluginsGLPI/tag',
+      'homepage'       => 'https://github.com/itsmng/tag',
       'license'        => '<a href="'.Plugin::getWebDir('tag').'/LICENSE" target="_blank">GPLv2+</a>',
       'requirements'   => [
          'glpi' => [
