@@ -1,0 +1,13 @@
+Source: tag
+Section: web
+Priority: standard
+Maintainer: ITSMng SysAdmin <sysadmin@itsm-ng.com>
+Build-Depends:	debhelper (>= 9),
+		composer
+Rules-Requires-Root: no
+Homepage: https://github.com/itsmng/tag
+
+Package: itsm-ng-plugin-tag
+Architecture: all
+Depends: itsm-ng (>= 1:2.0),
+Description: Add tag management to you ITSM-NG Assets
